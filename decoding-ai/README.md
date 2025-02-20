@@ -35,6 +35,7 @@ Or dial: ‪(US) +1 747-242-3856‬ PIN: ‪127 013 957‬#
 - [Prompt Styles](./demos/sample-prompts/Prompt-Styles.md)
 - [Socrates Fact Checker](./demos/socrates/README.md)
 - [Snowfall Predictor](./demos/sample-prompts/snowfall/README.md)
+- [Research Example](./demos/research/README.md)
 
 ## License
 
