@@ -8,19 +8,33 @@ The speaker of this program will be Bob Hong, an innovation leader and technolog
 
 ## Event Details (Original)
 
-Decoding AI: Today & Tomorrow
+https://bit.ly/4hPbqCE
+
+**Decoding AI: Today & Tomorrow**
+
+<img src="./bit.ly_4hPbqCE.png" width="200" height="200" alt="Decoding AI: Today & Tomorrow">
+
 Sunday, February 23 · 6:30 – 8:00pm
 Time zone: America/New_York
+
 Google Meet joining info
-Video call link: https://meet.google.com/fwb-aeke-ffw
+[Video call link](https://meet.google.com/fwb-aeke-ffw)
+
 Or dial: ‪(US) +1 747-242-3856‬ PIN: ‪127 013 957‬#
-More phone numbers: https://tel.meet/fwb-aeke-ffw?pin=7178090521927
+[More phone numbers](https://tel.meet/fwb-aeke-ffw?pin=7178090521927)
 
 > Note: Links to the video call will not work after the event, but the recording link, slides and resources will be available here.
 
 ## Contents
 
-[slides - pdf](./Decoding%20AI_%20Today%20&%20Tomorrow.pdf)
+[Presentation](./Decoding%20AI_%20Today%20&%20Tomorrow.pdf)
+
+### Demos
+
+- [Adventure-Game](./demos/sample-prompts/Adventure-Game.md)
+- [Prompt Styles](./demos/sample-prompts/Prompt-Styles.md)
+- [Socrates Fact Checker](./demos/socrates/README.md)
+- [Snowfall Predictor](./demos/sample-prompts/snowfall/README.md)
 
 ## License
 
