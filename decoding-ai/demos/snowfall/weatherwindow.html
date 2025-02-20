@@ -1,0 +1,249 @@
+<!-- Leaflet JS -->
+<script
+  src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+  integrity="sha256-o9N1j7kL1bRFY32kYga3Vf5QkLQ9C2Hqv+38Q+3QtkM="
+  crossorigin=""
+></script>
+<!-- noUiSlider JS -->
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"
+  integrity="sha512-BpY3X9x/3f1ZB5+yk0o1HwrHR+E5YqBKngxKS/JlaUMr2eWOLofcATTh0E05gtr/C4vP0LZ1gp1T4ij2L/rZdw=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+
+<script>
+  // Global variables and configuration
+  let map;
+  let gridOverlay;
+  const GRID_SIZE = 5; // Grid cells per row/column
+
+  // Initialize the map
+  function initMap(lat = 43.0, lon = -84.9, zoom = 10) {
+    if (map) {
+      map.setView([lat, lon], zoom);
+      return;
+    }
+    map = L.map("map").setView([lat, lon], zoom);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(map);
+
+    // Initialize custom grid overlay layer
+    gridOverlay = new GridOverlay();
+    gridOverlay.addTo(map);
+    // Update grid overlay when map view changes.
+    map.on("moveend", updateOverlayGrid);
+  }
+
+  // Geocode zip code using Nominatim API.
+  async function geocodeZip(zip) {
+    const url =
+      "https://nominatim.openstreetmap.org/search?format=json&countrycodes=us&postalcode=" +
+      encodeURIComponent(zip);
+    try {
+      const response = await fetch(url, {
+        headers: { "User-Agent": "SnowfallPredictorApp/1.0" },
+      });
+      const data = await response.json();
+      if (data && data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+        return { lat, lon };
+      } else {
+        alert("Zip code not found.");
+        return null;
+      }
+    } catch (error) {
+      console.error("Geocode error:", error);
+      alert("Error fetching geocode data.");
+      return null;
+    }
+  }
+
+  // Custom grid overlay layer using a canvas element.
+  const GridOverlay = L.Layer.extend({
+    initialize: function () {
+      this._canvas = L.DomUtil.create("canvas", "leaflet-grid-overlay");
+      this._cellData = [];
+      L.DomEvent.disableClickPropagation(this._canvas);
+    },
+    onAdd: function () {
+      const pane = map.getPane("overlayPane");
+      pane.appendChild(this._canvas);
+      this._reset();
+      map.on("moveend", this._reset, this);
+      window.addEventListener("resize", this._reset.bind(this));
+    },
+    onRemove: function () {
+      L.DomUtil.remove(this._canvas);
+      map.off("moveend", this._reset, this);
+      window.removeEventListener("resize", this._reset.bind(this));
+    },
+    _reset: function () {
+      const size = map.getSize();
+      this._canvas.width = size.x;
+      this._canvas.height = size.y;
+      this._canvas.style.width = size.x + "px";
+      this._canvas.style.height = size.y + "px";
+      this.redraw();
+    },
+    redraw: function () {
+      if (!this._cellData) return;
+      const ctx = this._canvas.getContext("2d");
+      ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+      // Draw each grid cell with a colored overlay indicating snowfall
+      for (let cell of this._cellData) {
+        const nw = map.latLngToContainerPoint(cell.bounds.getNorthWest());
+        const se = map.latLngToContainerPoint(cell.bounds.getSouthEast());
+        const width = se.x - nw.x;
+        const height = se.y - nw.y;
+        ctx.fillStyle = getColor(cell.snowfall);
+        ctx.globalAlpha = 0.5;
+        ctx.fillRect(nw.x, nw.y, width, height);
+        ctx.strokeStyle = "#333";
+        ctx.globalAlpha = 0.7;
+        ctx.strokeRect(nw.x, nw.y, width, height);
+      }
+    },
+    // Update the grid cells data and redraw the overlay.
+    updateCells: function (cellData) {
+      this._cellData = cellData;
+      this.redraw();
+    },
+  });
+
+  // Utility: Determine color based on predicted snowfall (centimeters).
+  function getColor(snowfall) {
+    const maxSnow = 20; // maximum expected snowfall (cm)
+    let t = Math.min(snowfall / maxSnow, 1);
+    // Interpolate between light blue and dark blue.
+    const r = Math.floor(200 - t * 100);
+    const g = Math.floor(220 - t * 150);
+    const b = Math.floor(255 - t * 200);
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
+  // Call the Open-Meteo API to fetch hourly snowfall predictions.
+  async function fetchSnowfall(lat, lon, startTimeMillis, endTimeMillis) {
+    // Convert milliseconds to YYYY-MM-DD strings. Open-Meteo requires full days.
+    const startDate = new Date(startTimeMillis).toISOString().split("T")[0];
+    const endDate = new Date(endTimeMillis).toISOString().split("T")[0];
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=snowfall&start_date=${startDate}&end_date=${endDate}&timezone=UTC`;
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      if (!data.hourly || !data.hourly.time || !data.hourly.snowfall)
+        return 0;
+      const times = data.hourly.time;
+      const snowfallArr = data.hourly.snowfall;
+      let total = 0;
+      for (let i = 0; i < times.length; i++) {
+        const t = new Date(times[i]).getTime();
+        if (t >= startTimeMillis && t <= endTimeMillis) {
+          total += snowfallArr[i] ? parseFloat(snowfallArr[i]) : 0;
+        }
+      }
+      return total;
+    } catch (error) {
+      console.error("Error fetching snowfall:", error);
+      return 0;
+    }
+  }
+
+  // Update grid overlay based on the current map bounds and time slider time window.
+  async function updateOverlayGrid() {
+    if (!map || !gridOverlay) return;
+    const bounds = map.getBounds();
+    const north = bounds.getNorth();
+    const south = bounds.getSouth();
+    const east = bounds.getEast();
+    const west = bounds.getWest();
+    const latStep = (north - south) / GRID_SIZE;
+    const lonStep = (east - west) / GRID_SIZE;
+    const cells = [];
+    // Get time window from the slider.
+    const sliderValues = timeSlider.noUiSlider.get();
+    const tStart = parseInt(sliderValues[0], 10);
+    const tEnd = parseInt(sliderValues[1], 10);
+
+    let promises = [];
+    for (let i = 0; i < GRID_SIZE; i++) {
+      for (let j = 0; j < GRID_SIZE; j++) {
+        const cellNorth = north - i * latStep;
+        const cellSouth = north - (i + 1) * latStep;
+        const cellWest = west + j * lonStep;
+        const cellEast = west + (j + 1) * lonStep;
+        const cellBounds = L.latLngBounds(
+          L.latLng(cellSouth, cellWest),
+          L.latLng(cellNorth, cellEast)
+        );
+        const center = cellBounds.getCenter();
+        // Fetch snowfall prediction for this grid cell.
+        const cellPromise = fetchSnowfall(
+          center.lat,
+          center.lng,
+          tStart,
+          tEnd
+        ).then((snowfall) => {
+          return { bounds: cellBounds, snowfall: snowfall };
+        });
+        promises.push(cellPromise);
+      }
+    }
+    const results = await Promise.all(promises);
+    gridOverlay.updateCells(results);
+  }
+
+  // Initialize time slider using noUiSlider.
+  let timeSlider;
+  function initTimeSlider() {
+    const sliderElem = document.getElementById("timeSlider");
+    const now = Date.now();
+    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+    timeSlider = noUiSlider.create(sliderElem, {
+      start: [now, now + sevenDays],
+      connect: true,
+      range: { min: now, max: now + sevenDays },
+      step: 60 * 60 * 1000, // one hour steps
+      format: {
+        to: (value) => Math.round(value),
+        from: (value) => Number(value),
+      },
+    });
+    const startLabel = document.getElementById("startLabel");
+    const endLabel = document.getElementById("endLabel");
+    function updateLabels(values) {
+      startLabel.textContent = "Begin: " + new Date(+values[0]).toLocaleString();
+      endLabel.textContent = "End: " + new Date(+values[1]).toLocaleString();
+    }
+    timeSlider.noUiSlider.on("update", function (values) {
+      updateLabels(values);
+    });
+    timeSlider.noUiSlider.on("change", function () {
+      updateOverlayGrid();
+    });
+    updateLabels([now, now + sevenDays]);
+  }
+
+  // Set up event listener for the "Go" button to re-center map using zip code.
+  document.getElementById("goButton").addEventListener("click", async () => {
+    const zip = document.getElementById("zipInput").value.trim();
+    if (!zip) return;
+    const coords = await geocodeZip(zip);
+    if (coords) {
+      map.setView([coords.lat, coords.lon], 12);
+      updateOverlayGrid();
+    }
+  });
+
+  // Initialize the application once DOM is ready.
+  document.addEventListener("DOMContentLoaded", () => {
+    initMap();
+    initTimeSlider();
+    // Delay initial grid update to allow map to render.
+    setTimeout(updateOverlayGrid, 500);
+  });
+</script>

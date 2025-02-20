@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route Planner</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            height: calc(100% - 70px);
+            width: 100%;
+        }
+        #controls {
+            height: 70px;
+            padding: 10px;
+            background-color: #f0f0f0;
+        }
+        input, button {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <input id="start" type="text" placeholder="Start location (e.g., New York, NY)">
+        <input id="end" type="text" placeholder="End location (e.g., Boston, MA)">
+        <button onclick="planRoute()">Plan Route</button>
+    </div>
+    <div id="map"></div>
+
+    <script>
+        // Declare routingControl globally
+        let routingControl;
+
+        // Initialize the map
+        const map = L.map('map').setView([42.7325, -84.5555], 6); // Default center (Michigan)
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Initialize routing control with no waypoints initially
+        routingControl = L.Routing.control({
+            waypoints: [], // Empty waypoints at initialization
+            routeWhileDragging: true,
+            geocoder: L.Control.Geocoder.nominatim(), // Use Nominatim for geocoding
+            showAlternatives: true,
+            altLineOptions: { styles: [{ color: 'blue', opacity: 0.7, weight: 4 }] }
+        }).addTo(map);
+
+        // Geocode a location using Nominatim
+        async function geocodeLocation(location) {
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`);
+            const data = await response.json();
+            if (data.length === 0) throw new Error(`Location "${location}" not found.`);
+            return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+        }
+
+        // Plan a route based on user inputs
+        async function planRoute() {
+            const startInput = document.getElementById('start').value;
+            const endInput = document.getElementById('end').value;
+
+            try {
+                // Geocode the start and end locations
+                const startCoords = await geocodeLocation(startInput);
+                const endCoords = await geocodeLocation(endInput);
+
+                // Update the routing control with new waypoints
+                routingControl.setWaypoints([
+                    L.latLng(startCoords[0], startCoords[1]),
+                    L.latLng(endCoords[0], endCoords[1])
+                ]);
+            } catch (error) {
+                alert(error.message);
+                console.error(error);
+            }
+        }
+
+        // Initialize the map with a default route on page load
+        window.onload = async function () {
+            try {
+                const startCoords = await geocodeLocation("New York, NY");
+                const endCoords = await geocodeLocation("Boston, MA");
+
+                routingControl.setWaypoints([
+                    L.latLng(startCoords[0], startCoords[1]),
+                    L.latLng(endCoords[0], endCoords[1])
+                ]);
+            } catch (error) {
+                console.error("Error initializing default route:", error.message);
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snowfall Prediction Map</title>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { height: 80vh; width: 100%; }
+        #controls { margin: 10px; }
+        .time-slider { width: 100%; }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <label for="zipInput">Enter ZIP Code:</label>
+        <input type="text" id="zipInput" value="48895">
+        <button onclick="updateMap()">Update Map</button>
+        <br><br>
+        <label for="timeSlider">Select Time Range:</label>
+        <input type="range" id="timeSlider" class="time-slider" min="0" max="7" step="1" value="0" oninput="updateOverlay()">
+        <span id="timeLabel">0 days from now</span>
+    </div>
+    <div id="map"></div>
+
+    <script>
+        // Initialize the map
+        const map = L.map('map').setView([42.7325, -84.5555], 10); // Default center (near ZIP 48895)
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        let gridLayer = null;
+
+        // Function to fetch snowfall data and update the overlay
+        async function updateOverlay() {
+            const zipCode = document.getElementById('zipInput').value;
+            const daysAhead = document.getElementById('timeSlider').value;
+            const timeLabel = document.getElementById('timeLabel');
+            timeLabel.textContent = `${daysAhead} days from now`;
+
+            try {
+                // Fetch coordinates for the ZIP code using Nominatim
+                const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${zipCode}&country=US&format=json`);
+                const geoData = await geoRes.json();
+                if (geoData.length === 0) throw new Error("Invalid ZIP Code");
+                const lat = parseFloat(geoData[0].lat);
+                const lon = parseFloat(geoData[0].lon);
+
+                // Center map on the new location
+                map.setView([lat, lon], 10);
+
+                // Fetch snowfall prediction data from Open-Meteo API
+                const forecastRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=snowfall_sum&timezone=auto`);
+                const forecastData = await forecastRes.json();
+                const snowfall = forecastData.daily.snowfall_sum[daysAhead];
+
+                // Remove existing overlay (if any)
+                if (gridLayer) {
+                    map.removeLayer(gridLayer);
+                    gridLayer = null;
+                }
+
+                // Add new overlay
+                const sw = L.latLng(lat - 0.1, lon - 0.1); // Southwest corner of rectangle
+                const ne = L.latLng(lat + 0.1, lon + 0.1); // Northeast corner of rectangle
+                gridLayer = L.rectangle(L.latLngBounds(sw, ne), {
+                    color: 'blue',
+                    weight: 1,
+                    fillOpacity: Math.min(snowfall / 20, 1) // Normalize opacity based on snowfall
+                }).addTo(map);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                alert("Failed to fetch data. Please check the ZIP code or try again later.");
+            }
+        }
+
+        // Initialize map with default ZIP code
+        updateOverlay();
+
+        function updateMap() {
+            updateOverlay();
+        }
+    </script>
+</body>
+</html>

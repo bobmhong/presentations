@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Map</title>
+    <style>
+        /* Inline CSS for styling */
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        #controls { padding: 10px; text-align: center; }
+        #zipInput { padding: 8px; margin-right: 10px; }
+        #updateButton { padding: 8px 15px; cursor: pointer; }
+        #tempUnits { margin-top: 10px; }
+        #map { height: 500px; width: 100%; }
+        .popup-chart { width: 300px; height: 250px; } /* Style for chart popups */
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div id="controls">
+    <input type="text" id="zipInput" placeholder="Enter ZIP Code" value="48895">
+    <button id="updateButton">Update Location</button>
+    <div id="tempUnits">
+        <input type="radio" id="fahrenheit" name="units" value="fahrenheit" checked>
+        <label for="fahrenheit">Fahrenheit</label>
+        <input type="radio" id="celsius" name="units" value="celsius">
+        <label for="celsius">Celsius</label>
+    </div>
+</div>
+
+<div id="map"></div>
+
+<script>
+    // JavaScript for map and data functionality
+    var map = L.map('map').setView([42.7304, -84.4839], 10); // Initial center on ZIP code 48895
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    var currentUnit = 'fahrenheit'; // Default unit
+
+    function updateMapLocation(zipCode) {
+        // Use Nominatim API to get lat/lon from ZIP code
+        fetch(`https://nominatim.openstreetmap.org/search?postalcode=${zipCode}&country=US&format=jsonv2`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    var lat = parseFloat(data[0].lat);
+                    var lon = parseFloat(data[0].lon);
+                    map.setView([lat, lon], 10); // Center map on new coordinates
+                } else {
+                    alert('Invalid ZIP code. Please enter a valid ZIP code.');
+                }
+            })
+            .catch(error => {
+                alert('Error fetching location data. Please try again.');
+                console.error('Error:', error);
+            });
+    }
+
+    function fetchWeatherData(lat, lon) {
+        // Fetch weather data using open-meteo API
+        const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=snowfall_sum,temperature_2m_max&forecast_days=7`;
+        return fetch(apiUrl)
+            .then(response => response.json());
+    }
+
+    function createPopupContent(weatherData, unit) {
+        // Create popup content with charts
+        const popupDiv = document.createElement('div');
+        popupDiv.className = 'popup-content';
+
+        const canvasSnowfall = document.createElement('canvas');
+        canvasSnowfall.className = 'popup-chart';
+        popupDiv.appendChild(canvasSnowfall);
+
+        const canvasTemperature = document.createElement('canvas');
+        canvasTemperature.className = 'popup-chart';
+        popupDiv.appendChild(canvasTemperature);
+
+        // Prepare data for charts
+        const days = weatherData.daily.time;
+        const snowfallData = weatherData.daily.snowfall_sum;
+        let temperatureData = weatherData.daily.temperature_2m_max;
+
+        if (unit === 'celsius') {
+            temperatureData = temperatureData.map(tempF => ((tempF - 32) * 5 / 9)); // Convert to Celsius
+        }
+
+        // Snowfall bar chart
+        new Chart(canvasSnowfall.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: days,
+                datasets: [{
+                    label: 'Snowfall (inches)',
+                    data: snowfallData.map(mm => mm / 25.4), // Convert mm to inches
+                    backgroundColor: 'rgba(0, 0, 255, 0.7)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true, // Ensure y-axis starts at 0 for snowfall
+                        title: { display: true, text: 'Inches' }
+                    }
+                }
+            }
+        });
+
+        // Temperature line graph
+        new Chart(canvasTemperature.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: days,
+                datasets: [{
+                    label: `Max Temperature (°${unit === 'fahrenheit' ? 'F' : 'C'})`,
+                    data: temperatureData,
+                    borderColor: 'rgba(255, 0, 0, 0.7)',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { title: { display: true, text: `°${unit === 'fahrenheit' ? 'F' : 'C'}` } }
+                }
+            }
+        });
+
+        return popupDiv;
+    }
+
+    function updateChartsUnit(unit) {
+        // Update all popups with the new temperature unit
+        map.eachLayer(layer => {
+            if (layer instanceof L.Popup) {
+                const latlng = layer.getLatLng();
+                const popup = layer; // Store the popup for later use in fetchWeatherData
+                fetchWeatherData(latlng.lat, latlng.lng)
+                    .then(weatherData => {
+                        const popupContent = createPopupContent(weatherData, unit);
+                        popup.setContent(popupContent); // Update popup content with new unit
+                    })
+                    .catch(error => {
+                        alert('Error fetching weather data. Please try again.');
+                        console.error('Error:', error);
+                    });
+            }
+        });
+    }
+
+
+    map.on('click', function(e) {
+        // Handle map clicks to display weather popup
+        const latlng = e.latlng;
+        fetchWeatherData(latlng.lat, latlng.lng)
+            .then(weatherData => {
+                const popupContent = createPopupContent(weatherData, currentUnit);
+                L.popup({maxWidth: 400, maxHeight: 300}) // Adjust popup size if needed
+                    .setLatLng(latlng)
+                    .setContent(popupContent)
+                    .openOn(map);
+            })
+            .catch(error => {
+                alert('Error fetching weather data. Please try again.');
+                console.error('Error:', error);
+            });
+    });
+
+    document.getElementById('updateButton').addEventListener('click', function() {
+        // Update map location on button click
+        const zipCode = document.getElementById('zipInput').value;
+        updateMapLocation(zipCode);
+    });
+
+    document.querySelectorAll('input[name="units"]').forEach(radio => {
+        // Update temperature unit on radio button change
+        radio.addEventListener('change', function() {
+            currentUnit = this.value;
+            updateChartsUnit(currentUnit);
+        });
+    });
+</script>
+
+</body>
+</html>
