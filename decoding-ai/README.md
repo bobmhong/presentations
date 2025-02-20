@@ -20,7 +20,7 @@ More phone numbers: https://tel.meet/fwb-aeke-ffw?pin=7178090521927
 
 ## Contents
 
-[slides - pdf]()
+[slides - pdf](./Decoding%20AI_%20Today%20&%20Tomorrow.pdf)
 
 ## License
 
