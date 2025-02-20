@@ -1,0 +1,57 @@
+openapi: 3.0.0
+info:
+  title: Socratic Truth Evaluator
+  version: 1.0.0
+paths:
+  /verify:
+    post:
+      summary: Verify a claim using Socratic method
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                claim:
+                  type: string
+                  maxLength: 1000
+      responses:
+        "200":
+          description: Successful verification
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerificationResponse"
+components:
+  schemas:
+    DecisionFactor:
+      type: object
+      properties:
+        sourceName:
+          type: string
+        sourceURL:
+          type: string
+          format: uri
+        sourceDate:
+          type: string
+          format: date-time
+        sourceTrustLevel:
+          type: integer
+          minimum: 1
+          maximum: 5
+        sourceAlignmentScore:
+          type: integer
+          minimum: -100
+          maximum: 100
+    VerificationResponse:
+      type: object
+      properties:
+        truthScore:
+          type: integer
+          minimum: -100
+          maximum: 100
+        decisionFactors:
+          type: array
+          items:
+            $ref: "#/components/schemas/DecisionFactor"
