@@ -2,6 +2,8 @@
 
 This repository contains slides and demo resources for the presentation below.
 
+![Robot Backyard Friends](./demos/images/robotbackyard.png)
+
 ## Summary
 
 The speaker of this program will be Bob Hong, an innovation leader and technology strategist.  He will review the latest development of AI and share with us his expertise in unlocking the full potential of AI tools for use in everyday life.
