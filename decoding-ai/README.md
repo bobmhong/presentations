@@ -47,54 +47,52 @@ Or dial: ‪(US) +1 747-242-3856‬ PIN: ‪127 013 957‬#
 
 ### Tools
 
-Links to chatbots and other AI tools will be provided here.
+Use this list as a starting point to begin exploring the AI tools and platforms mentioned in the presentation.
 
-    ### Tools
+- [ChatGPT](https://chatgpt.com/)
+    - OpenAI's flagship chatbot
+    - Excels at general knowledge, coding, and creative writing
+    - Multiple model versions (3.5, 4.0) with different capabilities
 
-    - [ChatGPT](https://chatgpt.com/)
-        - OpenAI's flagship chatbot
-        - Excels at general knowledge, coding, and creative writing
-        - Multiple model versions (3.5, 4.0) with different capabilities
+- [Perplexity](https://perplexity.ai/)
+    - Real-time internet search integration
+    - Cites sources automatically
+    - Focused on accurate, up-to-date information
 
-    - [Perplexity](https://perplexity.ai/)
-        - Real-time internet search integration
-        - Cites sources automatically
-        - Focused on accurate, up-to-date information
+- [Google Gemini](https://gemini.google.com/)
+    - Strong multimodal capabilities (text, images, code)
+    - Deep integration with Google's knowledge base
+    - Advanced mathematical and analytical abilities
 
-    - [Google Gemini](https://gemini.google.com/)
-        - Strong multimodal capabilities (text, images, code)
-        - Deep integration with Google's knowledge base
-        - Advanced mathematical and analytical abilities
+- [Claude](https://claude.ai/)
+    - Anthropic's AI with strong reasoning capabilities
+    - Handles longer context windows
+    - Known for technical writing and analysis
 
-    - [Claude](https://claude.ai/)
-        - Anthropic's AI with strong reasoning capabilities
-        - Handles longer context windows
-        - Known for technical writing and analysis
+- [Microsoft CoPilot](https://copilot.microsoft.com/)
+    - Integrated with Microsoft 365 suite
+    - Strong at creative content and coding
+    - Real-time web search capabilities
 
-    - [Microsoft CoPilot](https://copilot.microsoft.com/)
-        - Integrated with Microsoft 365 suite
-        - Strong at creative content and coding
-        - Real-time web search capabilities
+- [Grok](https://grok.com/)
+    - xAI's chatbot with real-time X/Twitter data access
+    - Known for witty responses
+    - Designed for more informal interactions
 
-    - [Grok](https://grok.com/)
-        - xAI's chatbot with real-time X/Twitter data access
-        - Known for witty responses
-        - Designed for more informal interactions
+- [DeepSeek](https://chat.deepseek.com/)
+    - Specialized in coding and technical tasks
+    - Open-source focus
+    - Strong mathematical capabilities
 
-    - [DeepSeek](https://chat.deepseek.com/)
-        - Specialized in coding and technical tasks
-        - Open-source focus
-        - Strong mathematical capabilities
+- [Notebook LM](https://notebooklm.google.com/)
+    - Google's focused research assistant
+    - Document analysis and summarization
+    - Collaborative note-taking features
 
-    - [Notebook LM](https://notebooklm.google.com/)
-        - Google's focused research assistant
-        - Document analysis and summarization
-        - Collaborative note-taking features
-
-    - [ChatBot Arena](https://lmarena.ai/)
-        - Compare different AI models side-by-side
-        - Benchmark performance
-        - Community-driven evaluations
+- [ChatBot Arena](https://lmarena.ai/)
+    - Compare different AI models side-by-side
+    - Benchmark performance
+    - Community-driven evaluations
 
 ## License
 
