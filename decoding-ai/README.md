@@ -36,6 +36,8 @@ Or dial: ‪(US) +1 747-242-3856‬ PIN: ‪127 013 957‬#
 - [Socrates Fact Checker](./demos/socrates/README.md)
 - [Snowfall Predictor](./demos/sample-prompts/snowfall/README.md)
 - [Research Example](./demos/research/README.md)
+- [Notebook LM Generated Podcast - Briefing for Alien Visitors](https://drive.google.com/file/d/13WPX9TIvIJW5gqJYlVHs3CCvgG3koRr4/view?usp=sharing)
+- [MusicFX Demo](https://drive.google.com/file/d/1V-pI11-2UsTuei-y1OpHqUWBdrcOrc82/view?usp=sharing)
 
 ## License
 
