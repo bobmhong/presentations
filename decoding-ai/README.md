@@ -101,9 +101,10 @@ Use this list as a starting point to begin exploring the AI tools and platforms 
     - These tools and many more to explore:
         - [ImageFX](https://labs.google/fx/tools/image-fx)
         - [MusicFX](https://labs.google/fx/tools/music-fx)
+        - [MusicFX DJ](https://labs.google/fx/tools/music-fx-dj)
         - [Whisk](https://labs.google/fx/tools/whisk)
+        - [Infinite Wonderland](https://infinitewonderland.withgoogle.com/)
     
-
 ## License
 
 MIT License
