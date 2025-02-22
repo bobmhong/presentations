@@ -94,6 +94,16 @@ Use this list as a starting point to begin exploring the AI tools and platforms 
     - Benchmark performance
     - Community-driven evaluations
 
+- [Google Labs](https://labs.google.com/)
+    - Experimental AI tools and features
+    - Early access to new technologies
+    - Focus on research and development
+    - These tools and many more to explore:
+        - [ImageFX](https://labs.google/fx/tools/image-fx)
+        - [MusicFX](https://labs.google/fx/tools/music-fx)
+        - [Whisk](https://labs.google/fx/tools/whisk)
+    
+
 ## License
 
 MIT License
