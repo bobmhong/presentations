@@ -19,22 +19,17 @@ https://bit.ly/4hPbqCE
 Sunday, February 23 · 6:30 – 8:00pm
 Time zone: America/New_York
 
-Google Meet joining info
-[Video call link](https://meet.google.com/fwb-aeke-ffw)
+## Recording
 
-Or dial: ‪(US) +1 747-242-3856‬ PIN: ‪127 013 957‬#
-[More phone numbers](https://tel.meet/fwb-aeke-ffw?pin=7178090521927)
+[Decoding AI: Today & Tomorrow Recording](https://youtu.be/VQbxcOWKv_c?si=K_7155l61Xtj99PY)
 
-> Note: Links to the video call will not work after the event, but the recording link, slides and resources will be available here.
+[![Decoding AI: Today & Tomorrow Recording](./yt_logo_rgb_light.png)](https://www.youtube.com/watch?v=VQbxcOWKv_c)
+
+
 
 ## Contents
 
 [Decoding AI: Today & Tomorrow PDF](./Decoding%20AI_%20Today%20&%20Tomorrow.pdf)
-
-## Recording
-- [Decoding AI: Today & Tomorrow Recording](https://youtu.be/VQbxcOWKv_c?si=K_7155l61Xtj99PY)
-
-[![Decoding AI: Today & Tomorrow Recording](./yt_logo_rgb_light.png)](https://www.youtube.com/watch?v=VQbxcOWKv_c)
 
 ### Demos
 
