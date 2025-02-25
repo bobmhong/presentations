@@ -32,8 +32,9 @@ Or dial: ‪(US) +1 747-242-3856‬ PIN: ‪127 013 957‬#
 [Decoding AI: Today & Tomorrow PDF](./Decoding%20AI_%20Today%20&%20Tomorrow.pdf)
 
 ## Recording
-- stay tuned...
+- [Decoding AI: Today & Tomorrow Recording](https://youtu.be/VQbxcOWKv_c?si=K_7155l61Xtj99PY)
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/VQbxcOWKv_c?si=K_7155l61Xtj99PY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ### Demos
 
