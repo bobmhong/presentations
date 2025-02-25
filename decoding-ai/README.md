@@ -34,7 +34,7 @@ Or dial: ‪(US) +1 747-242-3856‬ PIN: ‪127 013 957‬#
 ## Recording
 - [Decoding AI: Today & Tomorrow Recording](https://youtu.be/VQbxcOWKv_c?si=K_7155l61Xtj99PY)
 
-[![Decoding AI: Today & Tomorrow Recording](https://img.youtube.com/vi/v=VQbxcOWKv_c/0.jpg)](https://www.youtube.com/watch?v=VQbxcOWKv_c)
+[![Decoding AI: Today & Tomorrow Recording](./yt_logo_rgb_light.png)](https://www.youtube.com/watch?v=VQbxcOWKv_c)
 
 ### Demos
 
